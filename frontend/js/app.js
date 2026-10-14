@@ -71,7 +71,7 @@ async function doSearch(q){
   catch(e){ setStatus('Falha na busca 😬'); }
 }
 
-/* alternador de fonte (Audius completas / Apple prévias) */
+/* alternador de fonte (YT pessoal / Audius / Apple) */
 function initSourceToggle(){
   const el = document.getElementById('srcToggle');
   const sync = () => el.querySelectorAll('button').forEach(b =>
@@ -80,6 +80,15 @@ function initSourceToggle(){
   el.querySelectorAll('button').forEach(b =>
     b.addEventListener('click', () => {
       if(b.dataset.src === getSource()) return;
+      if(b.dataset.src === 'yt'){
+        const base = prompt(
+          'URL do seu backend YT (backend/yt-proxy):\n' +
+          'No PC: http://localhost:5000\n' +
+          'No Render: https://seu-servico.onrender.com',
+          ytBase());
+        if(base === null) return;
+        if(base.trim()) localStorage.setItem('sonora:ytbase', base.trim());
+      }
       setSource(b.dataset.src);
       sync();
       go(state.label === 'Em alta' || !state.label ? 'Em alta' : state.label);

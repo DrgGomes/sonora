@@ -9,7 +9,14 @@ const LOOKUP = 'https://itunes.apple.com/lookup';
 const CHARTS = 'https://rss.marketingtools.apple.com/api/v2/br/music/most-played/50/songs.json';
 const AUDIUS = 'https://discoveryprovider.audius.co/v1'; // faixas COMPLETAS (protocolo aberto)
 
+/* YT: backend PESSOAL (backend/yt-proxy) rodando no seu PC/Render.
+   Página HTTPS chama http://localhost normalmente no Chrome desktop. */
+function ytBase(){
+  return localStorage.getItem('sonora:ytbase') || 'http://localhost:5000';
+}
+
 const SOURCES = {
+  yt:     { label: 'YT Completas', hint: 'YouTube · seu backend' },
   audius: { label: 'Completas', hint: 'música inteira · Audius' },
   apple:  { label: 'Prévias 30s', hint: 'prévia oficial · Apple' }
 };
@@ -55,6 +62,26 @@ function normalizeAudius(t){
   };
 }
 
+/* ---- YT: via backend pessoal (yt-dlp) ---- */
+function normalizeYT(t){
+  return {
+    id: t.id,
+    title: t.title,
+    artist: t.uploader || 'YouTube',
+    album: '',
+    art: t.thumbnail || '',
+    preview: `${ytBase()}/stream?id=${t.id}`, // stream direto do proxy (suporta seek/Range)
+    time: fmt((t.duration || 0) * 1000),
+    source: 'yt'
+  };
+}
+
+async function ytSearch(term, limit = 15){
+  const res = await fetch(`${ytBase()}/api/search?q=${encodeURIComponent(term)}`);
+  if(!res.ok) throw new Error('backend YT: ' + res.status);
+  return (await res.json()).slice(0, limit).map(normalizeYT);
+}
+
 /* ---- Audius: faixas completas ---- */
 async function audiusSearch(term, limit = 50){
   const url = `${AUDIUS}/tracks/search?query=${encodeURIComponent(term)}&limit=${limit}&app_name=sonora`;
@@ -72,7 +99,9 @@ async function audiusTrending(){
 }
 
 async function searchSongs(term, limit = 50){
-  if(getSource() === 'audius') return audiusSearch(term, limit);
+  const src = getSource();
+  if(src === 'yt') return ytSearch(term);
+  if(src === 'audius') return audiusSearch(term, limit);
   const url = `${API}?term=${encodeURIComponent(term)}&entity=song&limit=${limit}&country=BR`;
   const res = await fetch(url);
   if(!res.ok) throw new Error('API ' + res.status);
@@ -83,6 +112,9 @@ async function searchSongs(term, limit = 50){
 /* Chart oficial (Apple Music BR) + preview resolvido em lote via lookup.
    Se falhar, cai para busca de hits. */
 async function trendingSongs(){
+  if(getSource() === 'yt'){
+    return ytSearch('top hits 2026');
+  }
   if(getSource() === 'audius'){
     try{ return await audiusTrending(); }
     catch(e){ return searchSongs('top hits', 50); }
