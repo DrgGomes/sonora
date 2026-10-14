@@ -39,17 +39,26 @@ const Player = {
     const myToken = ++loadToken;
     updatePlayerUI(t);
     pushRecent(t);
-    const playBtn = document.getElementById('btn-play');
-    playBtn.textContent = '…';
+    setPlayIcon('loading');
+    /* 1ª tentativa: URL direta (stream progressivo, começa a tocar já) */
+    try{
+      this.audio.src = t.preview;
+      await this.audio.play();
+      prefetchNext();
+      return;
+    }catch(e){ /* segue para o blob */ }
+    if(myToken !== loadToken) return;
+    /* 2ª tentativa: fetch + blob (Audius; contorna cadeia de redirects) */
     try{
       const url = await getStreamUrl(t);
-      if(myToken !== loadToken) return; // usuário trocou de faixa enquanto carregava
+      if(myToken !== loadToken) return;
       this.audio.src = url;
       await this.audio.play();
+      prefetchNext();
     }catch(e){
       if(myToken === loadToken){
-        playBtn.textContent = '▶';
-        document.getElementById('artist').textContent = 'Falha ao carregar o áudio 😕';
+        setPlayIcon('play');
+        document.getElementById('artist').textContent = 'Falha ao carregar o áudio — tente outra faixa';
       }
     }
   },
@@ -81,12 +90,36 @@ const Player = {
   }
 };
 
+/* Pré-carrega a próxima faixa (Audius) em segundo plano: troca instantânea */
+function prefetchNext(){
+  const q = Player.queue, i = Player.idx;
+  const nxt = Player.shuffle ? null : (q[i+1] || (q.length > 1 ? q[0] : null));
+  if(nxt && nxt.source === 'audius' && !blobCache.has(nxt.id)){
+    fetch(nxt.preview).then(r => r.ok ? r.blob() : null).then(b => {
+      if(b) blobCache.set(nxt.id, URL.createObjectURL(b));
+    }).catch(()=>{});
+  }
+}
+
+/* ---- ícones SVG do player ---- */
+const ICON = {
+  play:  '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>',
+  pause: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg>',
+  load:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin"><path d="M12 3a9 9 0 1 0 9 9" stroke-linecap="round"/></svg>'
+};
+
+function setPlayIcon(state){
+  document.getElementById('btn-play').innerHTML = ICON[state] || ICON.play;
+}
+
 /* ---- UI do player ---- */
 function updatePlayerUI(t){
   document.getElementById('art').src = t.art || 'assets/icon.svg';
   document.getElementById('title').textContent = t.title;
   document.getElementById('artist').textContent = t.artist;
   markPlaying(t.id);
+  document.getElementById('btn-fav').classList.toggle('faved',
+    getFavs().some(f => f.id === t.id));
   if('mediaSession' in navigator){
     try{
       navigator.mediaSession.metadata = new MediaMetadata({
@@ -127,9 +160,9 @@ function initPlayerUI(){
 
   playBtn.addEventListener('click', () => Player.toggle());
 
-  const setPlayIcon = () => playBtn.textContent = Player.audio.paused ? '▶' : '⏸';
-  Player.audio.addEventListener('play', setPlayIcon);
-  Player.audio.addEventListener('pause', setPlayIcon);
+  const setIconFromState = () => setPlayIcon(Player.audio.paused ? 'play' : 'pause');
+  Player.audio.addEventListener('play', setIconFromState);
+  Player.audio.addEventListener('pause', setIconFromState);
   Player.audio.addEventListener('ended', () => Player.next());
 
   document.getElementById('btn-next').addEventListener('click', () => Player.next());
@@ -154,7 +187,7 @@ function initPlayerUI(){
     const i = favs.findIndex(f => f.id === t.id);
     if(i >= 0) favs.splice(i,1); else favs.unshift(t);
     localStorage.setItem('sonora:favs', JSON.stringify(favs.slice(0,100)));
-    favBtn.textContent = i >= 0 ? '♡' : '♥';
+    favBtn.classList.toggle('faved', i < 0);
   });
 
   if('mediaSession' in navigator){

@@ -108,13 +108,17 @@ img{display:block}
 .progress input::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--acc);border:0}
 
 .controls{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
-.icon-btn{font-size:19px;padding:10px;color:var(--mut);transition:color .15s}
+.icon-btn{padding:10px;color:var(--mut);transition:color .15s}
+.icon-btn svg{width:21px;height:21px;display:block}
 .icon-btn.on{color:var(--acc)}
+.icon-btn.faved svg{fill:var(--acc);stroke:var(--acc)}
 .play-btn{
   width:56px;height:56px;border-radius:50%;background:var(--acc);color:#fff;
-  font-size:21px;display:grid;place-items:center;
+  display:grid;place-items:center;
   box-shadow:0 6px 22px rgba(229,56,59,.45);transition:transform .1s;
 }
+.play-btn svg{width:24px;height:24px;display:block}
+.play-btn .spin{animation:spin 1s linear infinite}
 .play-btn:active{transform:scale(.94)}
 
 /* ---------- fila ---------- */

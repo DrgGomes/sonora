@@ -17,15 +17,14 @@
     <div class="brand">
       <span class="brand-logo">♪</span>
       <span>Sonora</span>
-    </div>
-    <div class="searchbox">
+    </div>    <div class="searchbox">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
       <input id="search" type="search" placeholder="Buscar música ou artista…" autocomplete="off" enterkeyhint="search">
     </div>
     <div class="src-toggle" id="srcToggle" role="tablist" aria-label="Fonte de músicas">
-      <button data-src="yt" role="tab">▶ YT</button>
-      <button data-src="audius" role="tab">🎵 Completas</button>
-      <button data-src="apple" role="tab">▶︎ Prévias</button>
+      <button data-src="yt" role="tab">YT</button>
+      <button data-src="audius" role="tab">Completas</button>
+      <button data-src="apple" role="tab">Prévias</button>
     </div>
   </header>
 
@@ -46,7 +45,9 @@
       <strong id="title">Sonora</strong>
       <small id="artist">Escolha uma música para começar</small>
     </div>
-    <button id="btn-fav" class="icon-btn" aria-label="Favoritar">♡</button>
+    <button id="btn-fav" class="icon-btn" aria-label="Favoritar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path id="fav-path" d="M12 20.5C7 16.5 3.5 13.2 3.5 9.4 3.5 6.9 5.5 5 8 5c1.6 0 3.1.8 4 2.1C12.9 5.8 14.4 5 16 5c2.5 0 4.5 1.9 4.5 4.4 0 3.8-3.5 7.1-8.5 11.1z"/></svg>
+    </button>
   </div>
 
   <div class="progress">
@@ -56,11 +57,21 @@
   </div>
 
   <div class="controls">
-    <button id="btn-shuffle" class="icon-btn" aria-label="Aleatório">🔀</button>
-    <button id="btn-prev" class="icon-btn" aria-label="Anterior">⏮</button>
-    <button id="btn-play" class="play-btn" aria-label="Tocar">▶</button>
-    <button id="btn-next" class="icon-btn" aria-label="Próxima">⏭</button>
-    <button id="btn-queue" class="icon-btn" aria-label="Fila">☰</button>
+    <button id="btn-shuffle" class="icon-btn" aria-label="Aleatório">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="m15 15 6 6"/><path d="M4 4l5 5"/></svg>
+    </button>
+    <button id="btn-prev" class="icon-btn" aria-label="Anterior">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg>
+    </button>
+    <button id="btn-play" class="play-btn" aria-label="Tocar">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>
+    </button>
+    <button id="btn-next" class="icon-btn" aria-label="Próxima">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 5h2v14h-2zM4 5l11 7-11 7z"/></svg>
+    </button>
+    <button id="btn-queue" class="icon-btn" aria-label="Fila">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+    </button>
   </div>
 
   <div id="queue" class="queue hidden" aria-label="Fila de reprodução"></div>

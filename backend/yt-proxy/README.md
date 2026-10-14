@@ -24,12 +24,25 @@ python server.py        # porta 5000
 No app: fonte **▶ YT** → informe `http://localhost:5000`
 (funciona no Chrome desktop: páginas HTTPS podem chamar localhost).
 
-## Rodar em qualquer lugar (celular) — Render grátis
+## Rodar em qualquer lugar (celular) — Cloudflare Tunnel (grátis, sem login)
+
+No PC, com o `server.py` rodando, abra **outro terminal**:
+
+```bash
+# instala uma vez: https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/
+cloudflared tunnel --url http://localhost:5000
+```
+
+Vai aparecer um link tipo `https://algo-aleatorio.trycloudflare.com`.
+No celular: app Sonora → fonte **YT** → informe esse link. Funciona de
+qualquer rede (4G incluído), sem login, enquanto o PC estiver ligado.
+
+Alternativa 24/7 (PC desligado) — Render grátis:
 
 1. render.com → New → Web Service → conecte este repositório
 2. Root directory: `backend/yt-proxy`
 3. Build: `pip install -r requirements.txt` · Start: `python server.py`
-4. No app: fonte **▶ YT** → informe a URL do serviço (ex.: `https://sonora-yt.onrender.com`)
+4. No app: fonte **YT** → informe a URL do serviço (ex.: `https://sonora-yt.onrender.com`)
 
 > Free tier do Render "dorme" ~15 min sem uso (primeira música demora ~40s).
 > YouTube às vezes pede verificação em IPs de nuvem — no seu PC funciona melhor.
