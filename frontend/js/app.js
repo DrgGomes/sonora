@@ -71,7 +71,23 @@ async function doSearch(q){
   catch(e){ setStatus('Falha na busca 😬'); }
 }
 
+/* alternador de fonte (Audius completas / Apple prévias) */
+function initSourceToggle(){
+  const el = document.getElementById('srcToggle');
+  const sync = () => el.querySelectorAll('button').forEach(b =>
+    b.classList.toggle('on', b.dataset.src === getSource()));
+  sync();
+  el.querySelectorAll('button').forEach(b =>
+    b.addEventListener('click', () => {
+      if(b.dataset.src === getSource()) return;
+      setSource(b.dataset.src);
+      sync();
+      go(state.label === 'Em alta' || !state.label ? 'Em alta' : state.label);
+    }));
+}
+
 /* start */
+initSourceToggle();
 initPlayerUI();
 go('Em alta');
 

@@ -5,8 +5,9 @@ Acesse pelo link, ouça, busque e favorite. **Sem anúncios.**
 
 ## Como funciona (resumo)
 
-- **Catálogo**: [iTunes Search API](https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/iTunesSearchAPI/) — pública, grátis, sem chave, com músicas do mundo todo e CORS aberto.
-- **Áudio**: *previews oficiais de 30s* (AAC/m4a) servidos pela Apple — é conteúdo licenciado distribuído gratuitamente pela própria API, então **não há necessidade (nem base legal) de contornar anúncios** de terceiros.
+- **Fonte principal — Audius** ([docs.audius.org](https://docs.audius.org/developers/api)): protocolo aberto de música, **faixas COMPLETAS** (não prévias), streaming direto, CORS aberto, grátis (500 mil req/mês no plano free). Catálogo de artistas independentes que publicam de livre vontade — 100% legal, sem anúncios.
+- **Fonte alternativa — Apple/iTunes**: prévias oficiais de 30s do catálogo mundial (alternador na tela inicial).
+- **Áudio no navegador**: o stream do Audius é baixado via `fetch` (CORS liberado) e reproduzido via blob URL — contorna a limitação de redirects do elemento `<audio>`, com fallback para URL direta.
 - **Frontend**: HTML/CSS/JS puro — leve, rápido, funciona em qualquer hospedagem estática.
 - **Backend**: opcional; proxy de referência em `backend/` para uso futuro (playlists próprias, login, cache).
 

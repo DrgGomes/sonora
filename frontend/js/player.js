@@ -1,5 +1,24 @@
 /* ===== Sonora — motor de reprodução ===== */
 
+/* Audius: o <audio> não segue a cadeia de redirects do stream — baixamos via
+   fetch (CORS ok) e tocamos via blob URL. Cache por faixa na sessão. */
+const blobCache = new Map();
+let loadToken = 0;
+
+async function getStreamUrl(t){
+  if(t.source !== 'audius') return t.preview;
+  if(blobCache.has(t.id)) return blobCache.get(t.id);
+  try{
+    const res = await fetch(t.preview);
+    if(!res.ok) throw new Error('stream ' + res.status);
+    const url = URL.createObjectURL(await res.blob());
+    blobCache.set(t.id, url);
+    return url;
+  }catch(e){
+    return t.preview; // fallback: tenta URL direta (alguns navegadores seguem os redirects)
+  }
+}
+
 const Player = {
   audio: new Audio(),
   queue: [],
@@ -14,13 +33,25 @@ const Player = {
     this.play();
   },
 
-  play(){
+  async play(){
     const t = this.current();
     if(!t) return;
-    this.audio.src = t.preview;
-    this.audio.play().catch(()=>{});
+    const myToken = ++loadToken;
     updatePlayerUI(t);
     pushRecent(t);
+    const playBtn = document.getElementById('btn-play');
+    playBtn.textContent = '…';
+    try{
+      const url = await getStreamUrl(t);
+      if(myToken !== loadToken) return; // usuário trocou de faixa enquanto carregava
+      this.audio.src = url;
+      await this.audio.play();
+    }catch(e){
+      if(myToken === loadToken){
+        playBtn.textContent = '▶';
+        document.getElementById('artist').textContent = 'Falha ao carregar o áudio 😕';
+      }
+    }
   },
 
   toggle(){
@@ -30,6 +61,7 @@ const Player = {
 
   next(){
     if(!this.queue.length) return;
+    loadToken++;
     this.idx = this.shuffle
       ? Math.floor(Math.random() * this.queue.length)
       : (this.idx + 1) % this.queue.length;
@@ -38,6 +70,7 @@ const Player = {
 
   prev(){
     if(!this.queue.length) return;
+    loadToken++;
     if(this.audio.currentTime > 3){ this.audio.currentTime = 0; return; }
     this.idx = (this.idx - 1 + this.queue.length) % this.queue.length;
     this.play();
