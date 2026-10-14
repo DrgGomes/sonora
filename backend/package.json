@@ -1,0 +1,8 @@
+{
+  "name": "sonora-backend",
+  "version": "1.0.0",
+  "description": "Proxy opcional das APIs de catálogo do Sonora",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "dependencies": { "express": "^4.19.0" }
+}

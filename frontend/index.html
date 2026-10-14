@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0b">
+<meta name="description" content="Sonora — ouça músicas do mundo todo, grátis e sem anúncios.">
+<title>Sonora 🎵</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="app">
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-logo">♪</span>
+      <span>Sonora</span>
+    </div>
+    <div class="searchbox">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="search" type="search" placeholder="Buscar música ou artista…" autocomplete="off" enterkeyhint="search">
+    </div>
+  </header>
+
+  <main>
+    <nav id="chips" class="chips" aria-label="Categorias"></nav>
+
+    <section class="section">
+      <h1 id="listTitle">Em alta</h1>
+      <div id="list" class="list"></div>
+    </section>
+  </main>
+</div>
+
+<section id="player" class="player">
+  <div class="now">
+    <img id="art" alt="Capa do álbum" src="assets/icon.svg">
+    <div class="now-meta">
+      <strong id="title">Sonora</strong>
+      <small id="artist">Escolha uma música para começar</small>
+    </div>
+    <button id="btn-fav" class="icon-btn" aria-label="Favoritar">♡</button>
+  </div>
+
+  <div class="progress">
+    <span id="t0">0:00</span>
+    <input id="seek" type="range" min="0" max="30" value="0" step="0.1" aria-label="Progresso">
+    <span id="t1">0:30</span>
+  </div>
+
+  <div class="controls">
+    <button id="btn-shuffle" class="icon-btn" aria-label="Aleatório">🔀</button>
+    <button id="btn-prev" class="icon-btn" aria-label="Anterior">⏮</button>
+    <button id="btn-play" class="play-btn" aria-label="Tocar">▶</button>
+    <button id="btn-next" class="icon-btn" aria-label="Próxima">⏭</button>
+    <button id="btn-queue" class="icon-btn" aria-label="Fila">☰</button>
+  </div>
+
+  <div id="queue" class="queue hidden" aria-label="Fila de reprodução"></div>
+</section>
+
+<script src="js/api.js"></script>
+<script src="js/player.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

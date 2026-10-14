@@ -1,0 +1,13 @@
+{
+  "name": "Sonora",
+  "short_name": "Sonora",
+  "description": "Ouça músicas do mundo todo, grátis e sem anúncios.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0a0a0b",
+  "theme_color": "#0a0a0b",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
