@@ -1,0 +1,22 @@
+version: "3.8"
+# Sonora completo (app + yt-proxy + provedor de tokens POT) em uma máquina.
+# Uso pessoal. Requer Docker: docker compose up -d
+services:
+  bgutil-provider:
+    image: brainicism/bgutil-ytdlp-pot-provider
+    container_name: bgutil-provider
+    restart: unless-stopped
+
+  yt-proxy:
+    build:
+      context: .
+      dockerfile: backend/yt-proxy/Dockerfile
+    container_name: sonora-yt
+    restart: unless-stopped
+    depends_on:
+      - bgutil-provider
+    environment:
+      - POT_SERVER=http://bgutil-provider:4416
+      - PORT=5000
+    ports:
+      - "5000:5000"

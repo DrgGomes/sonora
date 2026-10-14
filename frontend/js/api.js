@@ -9,10 +9,15 @@ const LOOKUP = 'https://itunes.apple.com/lookup';
 const CHARTS = 'https://rss.marketingtools.apple.com/api/v2/br/music/most-played/50/songs.json';
 const AUDIUS = 'https://discoveryprovider.audius.co/v1'; // faixas COMPLETAS (protocolo aberto)
 
-/* YT: backend PESSOAL (backend/yt-proxy) rodando no seu PC/Render.
-   Página HTTPS chama http://localhost normalmente no Chrome desktop. */
+/* YT: backend PESSOAL (backend/yt-proxy) — mesma origem quando servido pelo
+   próprio backend (link único), ou localhost no PC. */
 function ytBase(){
-  return localStorage.getItem('sonora:ytbase') || 'http://localhost:5000';
+  const saved = localStorage.getItem('sonora:ytbase');
+  if(saved) return saved;
+  // se o app foi aberto pelo próprio yt-proxy (mesma origem), usa ele
+  const o = location.origin;
+  if(o && !o.includes('github.io') && !o.includes('localhost:8090')) return o;
+  return 'http://localhost:5000';
 }
 
 const SOURCES = {

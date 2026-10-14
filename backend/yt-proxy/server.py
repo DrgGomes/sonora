@@ -2,15 +2,44 @@
 # yt-dlp busca/transmite áudio do YouTube. Viola ToS do YouTube; pode quebrar a qualquer mudança deles.
 import subprocess, json, os
 import requests as rq
-from flask import Flask, request, Response, jsonify
+from flask import Flask, request, Response, jsonify, send_from_directory
 
 app = Flask(__name__)
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FRONTEND_DIR = os.environ.get('FRONTEND_DIR') or os.path.join(BASE_DIR, 'frontend')
+if not os.path.exists(os.path.join(FRONTEND_DIR, 'index.html')):
+    # rodando do repo sem Docker: frontend fica em ../../frontend
+    alt = os.path.abspath(os.path.join(BASE_DIR, '..', '..', 'frontend'))
+    if os.path.exists(os.path.join(alt, 'index.html')):
+        FRONTEND_DIR = alt
 YTDLP = ['python3', '-m', 'yt_dlp']  # portável (funciona com pip --user)
+
+# Provedor de tokens POT (bgutil) — ajuda a passar do bot-check em IPs de nuvem
+POT_SERVER = os.environ.get('POT_SERVER')  # ex.: http://bgutil-provider:4416
+# Cookies opcionais (recomendado: conta descartável do Google, configurado 1x)
+COOKIES = os.environ.get('YTDLP_COOKIES')
+
+def ytdlp_args():
+    args = []
+    if POT_SERVER:
+        args += ['--extractor-args', f'youtubepot-bgutilhttp:base_url={POT_SERVER}']
+    if COOKIES and os.path.exists(COOKIES):
+        args += ['--cookies', COOKIES]
+    return args
 
 def cors(r):
     r.headers['Access-Control-Allow-Origin'] = '*'
     return r
+
+# ---- frontend na mesma origem (link único pra família: http://servidor:5000/) ----
+@app.get('/')
+def index():
+    return send_from_directory(FRONTEND_DIR, 'index.html')
+
+@app.get('/<path:filename>')
+def static_files(filename):
+    return send_from_directory(FRONTEND_DIR, filename)
 
 @app.get('/health')
 def health():
@@ -23,7 +52,7 @@ def search():
         return cors(jsonify(error='q obrigatório')), 400
     try:
         out = subprocess.run(
-            YTDLP + ['-j', '--flat-playlist', '--no-warnings', f'ytsearch15:{q}'],
+            YTDLP + ytdlp_args() + ['-j', '--flat-playlist', '--no-warnings', f'ytsearch15:{q}'],
             capture_output=True, text=True, timeout=90)
         rows = []
         for line in out.stdout.strip().splitlines():
@@ -53,8 +82,8 @@ def stream():
         return cors(jsonify(error='id obrigatório')), 400
     try:
         out = subprocess.run(
-            YTDLP + ['-f', 'bestaudio', '-g', '--no-warnings',
-                     f'https://www.youtube.com/watch?v={vid}'],
+            YTDLP + ytdlp_args() + ['-f', 'bestaudio', '-g', '--no-warnings',
+                                    f'https://www.youtube.com/watch?v={vid}'],
             capture_output=True, text=True, timeout=90)
         lines = [l for l in out.stdout.strip().splitlines() if l.startswith('http')]
         if not lines:

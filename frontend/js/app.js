@@ -80,11 +80,14 @@ function initSourceToggle(){
   el.querySelectorAll('button').forEach(b =>
     b.addEventListener('click', () => {
       if(b.dataset.src === getSource()) return;
-      if(b.dataset.src === 'yt'){
+      if(b.dataset.src === 'yt' && !location.origin.includes('github.io') && !location.origin.includes('localhost:8090')){
+        // servido pelo próprio backend (link único): já configurado, sem prompt
+        localStorage.setItem('sonora:ytbase', location.origin);
+      }else if(b.dataset.src === 'yt'){
         const base = prompt(
-          'URL do seu backend YT (backend/yt-proxy):\n' +
-          'No PC: http://localhost:5000\n' +
-          'No Render: https://seu-servico.onrender.com',
+          'URL do backend YT:\n' +
+          '• PC local: http://localhost:5000\n' +
+          '• Railway/Render/VPS: https://seu-servico.up.railway.app',
           ytBase());
         if(base === null) return;
         if(base.trim()) localStorage.setItem('sonora:ytbase', base.trim());
